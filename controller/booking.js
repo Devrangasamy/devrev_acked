@@ -21,25 +21,24 @@ export const registerbooking=async(req,res,next)=>{
       next(err);
   }
 }
-  export const getbooking = async (req, res, next) => {
-    try {
-      console.log(req.query.customername);
-      
-      const filter={customer_name  : {"$regex" : req.query.customername}}
+export const getbooking = async (req, res, next) => {
+  try {
+    console.log(req.query.customername);
     
-      const book = await Booking.find(filter)
-      .populate({path:'flight',match:{ flightname  : {"$regex" : req.query.flightname},
-      from: {"$regex":req.query.from},
-      to: {"$regex":req.query.to},
-      take_off: {"$gte":req.query.depature},
-      land_off: {"$lte":req.query.arrival}
-    }}).exec();
-      res.status(200).json(book);
-    } catch (err) {
-      next(err);
-    }
-  };
-
+    const filter={customer_name  : {"$regex" : new RegExp(req.query.customername, "i")}}
+  
+    const book = await Booking.find(filter)
+    .populate({path:'flight',match:{ flightname  : {"$regex" : req.query.flightname},
+    from: {"$regex":new RegExp(req.query.from, "i")},
+    to: {"$regex":new RegExp(req.query.to , "i")},
+    take_off: {"$gte":req.query.depature},
+    land_off: {"$lte":req.query.arrival}
+  }}).exec();
+    res.status(200).json(book);
+  } catch (err) {
+    next(err);
+  }
+};
   export const deletebooking = async (req, res, next) => {
     try {
       const book = await Booking.findById(req.params.id);
